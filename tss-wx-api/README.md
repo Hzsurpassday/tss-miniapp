@@ -1,4 +1,6 @@
-# 时空智审 V1.0 RC2 契约适配层 —— 启动与验证说明
+# 时空智审 V1.0 RC3 契约适配层 —— 启动与验证说明
+
+> **⚠️ 本工程已脱离 `datahub-v2-src` 单体，完全独立**：`pom.xml` 的 parent 直接继承 `spring-boot-starter-parent`，**不再依赖 `datahub-v2` 任何内容**。复制本文件夹到任意装了 JDK 21 + Maven 的机器即可构建运行（默认 MOCK 模式，无需数据库）。
 
 > **状态**：本轮的 `/wx/v1`（API-01..API-11）与 `/admin/v1/tss`（API-12..API-13）**已真实实现并跑通 13 端点契约测试**（**98/98** 通过）。
 > 数据是 DEV Mock（`dataMode=MOCK`），**不代表已接入真实 ERP**。
@@ -11,7 +13,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 模块路径 | `E:\my-project\datahub-v2-src\datahub-v2-src\tss-wx-api` |
+| 模块路径 | `E:\my-project\tss-wx-api` |
 | Java 包 | `com.viding.datahub.tss.wx.*` |
 | 默认端口 | **8787**（契约修订决议 B2 指定的本机联调地址） |
 | 本机地址 | `http://127.0.0.1:8787` |
@@ -32,72 +34,51 @@
 
 ## 2. 环境要求
 
-| 组件 | 本机实测版本 | 说明 |
+| 组件 | 要求 | 说明 |
 | --- | --- | --- |
-| JDK | `C:\tss-build-tools\jdk21\jdk-21.0.13.0.2+1`（21） | **不要**用 `F:\DHERP\jdk`（那是 1.8，编译会失败） |
-| Maven | `C:\tss-build-tools\maven\apache-maven-3.9.9` | 本机无 `mvnw`，也没把 mvn 加进 PATH |
-| settings | `C:\tss-build-tools\settings.xml` | 阿里云镜像；当前仓库可离线构建 |
+| JDK | **21**（必须，Java 8/17 编译会失败） | 请自行安装并加入 `PATH`，或命令中显式指定 `JAVA_HOME` |
+| Maven | **3.9+** | 建议加入 `PATH`；未加入则在命令前指定 `MAVEN_HOME` |
+| 网络 | 首次构建需联网拉取依赖 | 内网可用阿里云镜像（`settings.xml`）加速；离线机需预先备好 `~/.m2` 缓存 |
 
-> 系统里 `java` / `mvn` **不在 PATH**（`java -version` 直接敲会报 command not found），
-> 但 `JAVA_HOME` 指向 `F:\DHERP\jdk`（Java 8）。所以下面每条命令都**显式指定** JDK21 与 Maven 路径，不要省略。
+> **移植要点**：原开发机 `JAVA_HOME` 曾指向 Java 8、且 `java`/`mvn` 不在 `PATH`——那是该机特例，**不是本工程要求**。在干净机器上只要 `JDK21 + Maven` 可用，直接 `mvn` 即可，无需任何 `C:\tss-build-tools\...` 路径。
 
 ---
 
 ## 3. 一步一条命令：构建
 
-在 **Git Bash** 中执行：
+在 **Git Bash / 终端** 中执行（假设 `JAVA_HOME` 指向 JDK 21、`mvn` 在 `PATH`）：
 
 ```bash
-# ① 固定工具链（每个新开终端都要执行一次）
-export JAVA_HOME="/c/tss-build-tools/jdk21/jdk-21.0.13.0.2+1"
-export MAVEN_HOME="/c/tss-build-tools/maven/apache-maven-3.9.9"
-export PATH="$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH"
+# ① 进入工程根目录
+cd /e/my-project/tss-wx-api
 
-# ② 进入仓库根目录
-cd /e/my-project/datahub-v2-src/datahub-v2-src
+# ② 编译
+mvn -DskipTests compile
 
-# ③ 编译（离线）
-mvn -s "C:/tss-build-tools/settings.xml" -o -pl tss-wx-api -DskipTests compile
+# ③ 跑全部测试（13 端点契约测试 + 门禁 + 游标 + 错误码清单）
+mvn test
 
-# ④ 跑全部测试（13 端点契约测试 + 门禁 + 游标 + 错误码清单），共 98 个
-mvn -s "C:/tss-build-tools/settings.xml" -o -pl tss-wx-api test
+# ④ 打可执行 fat-jar（target/tss-wx-api.jar）
+mvn package -DskipTests
 ```
 
-预期结果：`Tests run: 98, Failures: 0, Errors: 0` + `BUILD SUCCESS`。
+预期结果：`Tests run: ... Failures: 0, Errors: 0` + `BUILD SUCCESS`；`target/tss-wx-api.jar` 可直接 `java -jar` 运行。
 分布：`WxApiContractIT` 55 / `BindingViewResolverTest` 11 / `MockTokenGateTest` 13 / `CursorCodecTest` 10 / `TssErrorCodeTest` 4 / `WxAuthFailClosedTest` 3 / `AdminTokenConfigTest` 2。
 
 ---
 
 ## 4. 一步一条命令：启动（端口 8787）
 
-> 本机离线仓库**缺少 `maven-jar-plugin`**，因此 `mvn package` 打不出 jar；
-> 也**缺少 `spring-boot:run` 所需插件依赖**。下面的启动方式是把依赖 jar 收集到 `target/lib` 后直接用 `java` 启动，实测可用。
+> 标准启动（需先 `mvn package` 产出 `target/tss-wx-api.jar`）：
 
 ```bash
-export JAVA_HOME="/c/tss-build-tools/jdk21/jdk-21.0.13.0.2+1"
-export PATH="$JAVA_HOME/bin:$MAVEN_HOME/bin:$PATH"
-cd /e/my-project/datahub-v2-src/datahub-v2-src
+cd /e/my-project/tss-wx-api
 
-# ① 编译到 target/classes
-mvn -s "C:/tss-build-tools/settings.xml" -o -pl tss-wx-api -DskipTests compile
+# ① 打 jar（若已打过可跳过）
+mvn package -DskipTests
 
-# ② 收集依赖 jar（仅首次需要；已存在可跳过）
-cd tss-wx-api
-rm -rf target/lib && mkdir -p target/lib
-find ~/.m2/repository -name "*.jar" ! -name "*sources*" ! -name "*javadoc*" -exec cp {} target/lib/ \;
-
-# ③【重要】剔除本模块不声明、却会触发错误自动装配的 jar
-#    - 含 security 的：会启用 Spring Security 默认链，导致全部请求 401 空响应
-#    - 含 jdbc/flyway/quartz/mysql/mssql 的：会触发 DataSource 自动装配，因无 url 而启动失败
-mkdir -p target/lib-disabled
-for f in $(ls target/lib | grep -iE "security|jdbc|flyway|quartz|mysql|mssql|HikariCP|spring-boot-persistence"); do
-  mv "target/lib/$f" "target/lib-disabled/" 2>/dev/null
-done
-
-# ④ 启动（dev profile + 打开 DEV Mock 令牌四重门禁）
-"$JAVA_HOME/bin/java" \
-  -cp "target/classes;target/lib/*" \
-  com.viding.datahub.tss.wx.TssWxApiApplication \
+# ② 启动（dev profile + 打开 DEV Mock 令牌四重门禁）
+java -jar target/tss-wx-api.jar \
   --spring.profiles.active=dev \
   --server.port=8787 \
   --datahub.tss.wx.mock-token.enabled=true \
@@ -105,18 +86,22 @@ done
 ```
 
 看到 `Started TssWxApiApplication` 即启动成功。**不要关掉这个终端**（关掉即停服）。
+等价方式也可用 `mvn spring-boot:run`（效果相同）：
+`mvn spring-boot:run -Dspring-boot.run.profiles=dev -Dspring-boot.run.arguments="--server.port=8787 --datahub.tss.wx.mock-token.enabled=true --datahub.tss.wx.mock-token.env-attestation=DEV_LOCAL"`
 
 > ⚠️ **实测坑 1：必须显式传 `--server.port=8787`。**
 > 某些终端环境会注入 `SERVER__PORT=63891` 之类的环境变量，Spring Boot 宽松绑定会把它
 > 解析成 `server.port`，**优先级高于 `application.yml`**，导致服务静默起在 63891 而不是 8787。
-> 命令行参数优先级最高，因此上面第 ④ 步显式带 `--server.port=8787` 是必需的。
+> 命令行参数优先级最高，因此上面第 ② 步显式带 `--server.port=8787` 是必需的。
 >
 > ⚠️ **实测坑 2：curl 需要 `--noproxy '*'`。**
 > 若环境设置了 `HTTP_PROXY`，`curl http://127.0.0.1:8787/...` 会被代理拦截并返回 502。
 > 本仓库的 `smoke-13.sh` 已内置 `--noproxy '*'`；手工 curl 请自行加上。
-
-> 若有网络、能把 Maven 插件拉全，等价的常规启动方式是：
-> `mvn -pl tss-wx-api spring-boot:run -Dspring-boot.run.profiles=dev -Dspring-boot.run.arguments="--server.port=8787 --datahub.tss.wx.mock-token.enabled=true --datahub.tss.wx.mock-token.env-attestation=DEV_LOCAL"`
+>
+> 若某台机器本地 Maven 缓存缺失 `maven-jar-plugin` / `spring-boot-maven-plugin` 等插件、
+> 且无法联网补齐，可用退化方案：把所有 `~/.m2` 下的 jar 拷到 `target/lib` 后直接用
+> `java -cp "target/classes;target/lib/*" com.viding.datahub.tss.wx.TssWxApiApplication ...` 启动，
+> 并剔除 `security|jdbc|flyway|quartz|mysql|mssql|HikariCP` 等会触发多余自动装配的 jar（详见原交付说明）。
 
 ---
 
@@ -125,7 +110,7 @@ done
 ### 5.1 一键冒烟（推荐）
 
 ```bash
-cd /e/my-project/datahub-v2-src/datahub-v2-src/tss-wx-api
+cd /e/my-project/tss-wx-api
 BASE=http://127.0.0.1:8787 bash ./smoke-13.sh
 ```
 
@@ -207,7 +192,7 @@ curl -s -w "\n<<HTTP %{http_code}>>\n" -X POST $B/wx/v1/auth/login \
 ### 5.3 分页多页流转 + 非契约路径包络（真实 HTTP 证据）
 
 ```bash
-cd /e/my-project/datahub-v2-src/datahub-v2-src/tss-wx-api
+cd /e/my-project/tss-wx-api
 BASE=http://127.0.0.1:8787 bash ./smoke-pagination.sh
 ```
 
@@ -387,7 +372,7 @@ export TSS_WX_ADMIN_STATIC_TOKENS='<你的令牌>=ADMIN|E498AU5L35J'
 复现命令（服务已在 8787 运行、四重门禁已开）：
 
 ```bash
-cd /e/my-project/datahub-v2-src/datahub-v2-src/tss-wx-api
+cd /e/my-project/tss-wx-api
 BASE=http://127.0.0.1:8787 bash ./smoke-binding-matrix.sh   # 输出落在 target/binding-matrix.out
 ```
 

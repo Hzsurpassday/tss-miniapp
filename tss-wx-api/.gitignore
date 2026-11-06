@@ -1,0 +1,27 @@
+# ===== Maven / 构建产物 =====
+target/
+*.class
+*.jar
+*.war
+
+# ===== IDE / 编辑器 =====
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+
+# ===== OS / 临时 =====
+.DS_Store
+Thumbs.db
+*.log
+
+# ===== 安全：令牌/密钥（绝不入库） =====
+.ghtoken.txt
+*.token
+.env
+.env.local
+
+# ===== 本地依赖缓存（不需要随源码提交） =====
+target/lib/
+target/lib-disabled/

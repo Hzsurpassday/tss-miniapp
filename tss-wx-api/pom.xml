@@ -5,21 +5,26 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.viding</groupId>
-        <artifactId>datahub-v2</artifactId>
-        <version>2.0.0-SNAPSHOT</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.1</version>
+        <relativePath/>
     </parent>
 
+    <groupId>com.viding</groupId>
     <artifactId>tss-wx-api</artifactId>
-    <name>TSS WX API (RC2 /wx/v1 + /admin/v1/tss)</name>
+    <version>1.0.0</version>
+    <name>TSS WX API (RC3 /wx/v1 + /admin/v1/tss)</name>
     <description>
-        时空智审 V1.0 RC2 契约适配层：实现 /wx/v1 的 API-01..API-11 与 /admin/v1/tss 的 API-12..API-13。
+        时空智审 V1.0 RC3 契约适配层：实现 /wx/v1 的 API-01..API-11 与 /admin/v1/tss 的 API-12..API-13。
         字段级唯一标准为 tss-openapi-v1.0-rc2.yaml。V1.0 只读，不产生任何 ERP 审批写回。
-        独立模块的目的：可在不依赖 MySQL/Flyway/Quartz/后台管理会话的前提下于 8787 端口真实启动，
-        以便对 13 个端点执行真实 HTTP 契约测试；不修改、不影响既有 datahub-backend 的任何行为。
+        本模块已脱离 datahub-v2-src 单体，作为完全独立工程运行（parent 直接继承 spring-boot-starter-parent，
+        不依赖 datahub-v2 任何内容）：默认 dataMode=MOCK 可在 8787 端口真实启动，供 13 端点契约测试；
+        不修改、不影响既有 datahub-backend 的任何行为。
     </description>
 
     <properties>
+        <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
