@@ -15,3 +15,9 @@ tss-wx-api/target/
 Thumbs.db
 *.7z
 *.log
+
+# ===== 安全：令牌/密钥（绝不入库） =====
+.ghtoken.txt
+*.token
+.env
+.env.local
