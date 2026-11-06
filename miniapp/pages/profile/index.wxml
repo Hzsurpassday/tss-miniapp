@@ -1,0 +1,158 @@
+<view class="tss-page">
+
+  <view class="tss-notice danger" wx:if="{{errorText}}">
+    <view>{{errorText}}</view>
+    <view wx:if="{{traceId}}" class="pf-trace" bindtap="onCopyTraceId">traceId：{{traceId}}（点击复制）</view>
+  </view>
+
+  <!-- 账号信息 -->
+  <view class="tss-card">
+    <view class="tss-card-title">账号</view>
+    <view class="tss-row">
+      <text class="tss-row-label">姓名</text>
+      <text class="tss-row-value">{{displayNameText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">ERP 用户</text>
+      <text class="tss-row-value">{{userIdText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">企业</text>
+      <text class="tss-row-value">{{entIdText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">绑定状态</text>
+      <text class="tss-row-value">{{bindStatusText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">绑定版本</text>
+      <text class="tss-row-value">{{bindingVersionText}}</text>
+    </view>
+    <view class="tss-text-weak pf-tip">V1.0 单当前企业：企业由服务端绑定推导，不提供企业切换入口。</view>
+  </view>
+
+  <!-- 绑定状态（API-10） -->
+  <view class="tss-card" wx:if="{{binding}}">
+    <view class="tss-card-title">绑定详情</view>
+    <view class="tss-row">
+      <text class="tss-row-label">状态</text>
+      <text class="tss-row-value">{{binding.statusText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">申请号</text>
+      <text class="tss-row-value">{{binding.bindRequestIdText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">ERP 账号</text>
+      <text class="tss-row-value">{{binding.erpUserMaskedText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">企业</text>
+      <text class="tss-row-value">{{binding.entDisplayNameText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">检查时间</text>
+      <text class="tss-row-value">{{binding.checkedAtText}}</text>
+    </view>
+  </view>
+
+  <!-- 绑定态冲突提示：仅 develop 可见（对方服务缺陷，不改写渲染、不弹 toast） -->
+  <view class="tss-notice pf-conflict" wx:if="{{devVisible && bindingConflict}}">
+    {{bindingConflictText}}
+  </view>
+
+  <!-- 发起绑定 -->
+  <view class="tss-card">
+    <view class="tss-card-title">绑定 ERP 账号</view>
+    <input class="pf-input" placeholder="请输入 PC 端生成的邀请码" value="{{inviteCode}}" bindinput="onInviteInput" />
+    <view class="tss-btn {{busy ? 'disabled' : ''}}" bindtap="onBindTap">{{busy ? '处理中…' : '提交绑定申请'}}</view>
+    <view class="tss-text-weak pf-tip">提交后需 PC 管理端确认；本操作不会写入 ERP。</view>
+  </view>
+
+  <!-- 危险操作 -->
+  <view class="tss-card">
+    <view class="tss-card-title">账号操作</view>
+    <view class="tss-btn danger" bindtap="onUnbindTap">解绑 ERP 账号</view>
+    <view class="tss-btn plain" bindtap="onLogoutTap">退出登录</view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="tss-card">
+    <view class="tss-card-title">关于</view>
+    <view class="tss-row">
+      <text class="tss-row-label">版本</text>
+      <text class="tss-row-value">{{appVersion}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">契约版本</text>
+      <text class="tss-row-value">{{contractVersion}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">AppID</text>
+      <text class="tss-row-value tss-mono">{{appId}}</text>
+    </view>
+    <view class="tss-divider"></view>
+    <view class="tss-text-sub">{{privacy}}</view>
+    <view class="tss-text-sub pf-tip">{{readonlyNotice}}</view>
+  </view>
+
+  <!-- 开发者选项：仅 develop 可见 -->
+  <view class="tss-card" wx:if="{{devVisible}}">
+    <view class="tss-card-title">
+      <text>开发者选项</text>
+      <text class="tss-card-sub">仅 develop 可见</text>
+    </view>
+
+    <view class="tss-row">
+      <text class="tss-row-label">base URL</text>
+      <text class="tss-row-value tss-mono">{{baseUrl}}</text>
+    </view>
+    <view class="tss-notice" wx:if="{{!https}}">
+      非 HTTPS 地址仅可在开发者工具「不校验合法域名」下使用；真机与生产不可用。
+    </view>
+
+    <picker mode="selector" range="{{presets}}" range-key="label" value="{{presetIndex}}" bindchange="onPresetChange">
+      <view class="pf-picker">切换预设：{{presets[presetIndex].label}}</view>
+    </picker>
+
+    <input class="pf-input" placeholder="自定义 base URL，如 http://127.0.0.1:8787" value="{{customUrl}}" bindinput="onCustomUrlInput" />
+    <view class="tss-btn ghost" bindtap="onApplyCustomUrl">应用自定义地址</view>
+    <view class="tss-btn plain" bindtap="onResetBaseUrl">恢复默认地址</view>
+
+    <view class="tss-divider"></view>
+
+    <view class="pf-switch-row">
+      <text class="pf-switch-label">DEV Mock 令牌（本机 8787）</text>
+      <switch checked="{{devMockTokenEnabled}}" bindchange="onDevTokenSwitch" />
+    </view>
+    <view class="tss-text-weak pf-tip">
+      走非 RC2 的 /dev-support/v1/mock-token 直接换取已绑定会话；需后端 dev profile +
+      mock-token.enabled=true + env-attestation=DEV_LOCAL + 回环来源。仅 develop、默认禁用。
+    </view>
+    <input class="pf-input" placeholder="entId" value="{{devMockEntId}}" bindinput="onDevEntInput" />
+    <input class="pf-input" placeholder="userId" value="{{devMockUserId}}" bindinput="onDevUserInput" />
+
+    <view class="tss-divider"></view>
+
+    <view class="pf-switch-row">
+      <text class="pf-switch-label">Mock 会话码登录（API-01）</text>
+      <switch checked="{{mockSessionEnabled}}" bindchange="onMockSessionSwitch" />
+    </view>
+    <view class="tss-text-weak pf-tip">
+      走 RC2 API-01，用约定的 code 换取会话（远程 Mock 用 MOCK_BOUND 可得已绑定会话）。默认禁用。
+    </view>
+    <input class="pf-input" placeholder="Mock 会话码" value="{{mockSessionCode}}" bindinput="onMockCodeInput" />
+
+    <view class="tss-btn plain" bindtap="onRelogin">按当前配置重新登录</view>
+
+    <view class="tss-divider"></view>
+
+    <view class="pf-switch-row">
+      <text class="pf-switch-label">静态样例兜底</text>
+      <switch checked="{{staticSampleEnabled}}" bindchange="onStaticSampleSwitch" />
+    </view>
+    <view class="tss-text-weak pf-tip">开启后接口失败时使用 api-examples-rc2.json 静态样例，页面会显著标注来源。</view>
+  </view>
+
+  <view class="tss-loading" wx:if="{{loading}}">加载中…</view>
+</view>

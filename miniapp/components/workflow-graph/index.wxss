@@ -1,0 +1,284 @@
+.wf {
+  display: block;
+}
+
+.wf-head {
+  padding-bottom: 12rpx;
+}
+
+.wf-head-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 8rpx 0;
+}
+
+.wf-label {
+  color: var(--tss-text-sub);
+  font-size: 26rpx;
+}
+
+.wf-value {
+  font-size: 26rpx;
+  color: var(--tss-text);
+  word-break: break-all;
+  text-align: right;
+}
+
+.wf-value.wf-missing {
+  color: var(--tss-text-weak);
+}
+
+.wf-current {
+  color: var(--tss-primary);
+}
+
+/* graphType 降级声明（DAG / UNKNOWN / 缺失）：如实说明"按节点顺序展示"，不谎称完整支持 */
+.wf-degraded {
+  background: #f7f8fa;
+  border-radius: 8rpx;
+  padding: 10rpx 16rpx;
+  margin-top: 8rpx;
+}
+
+.wf-degraded-text {
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+}
+
+.wf-readonly {
+  display: flex;
+  align-items: center;
+  background: #f0f2f6;
+  border-radius: 10rpx;
+  padding: 14rpx 18rpx;
+  margin: 16rpx 0;
+}
+
+.wf-readonly-text {
+  margin-left: 14rpx;
+  font-size: 24rpx;
+  color: var(--tss-info);
+}
+
+.wf-missing-box {
+  background: #fff8e6;
+  border: 1rpx solid #ffe0a3;
+  border-radius: 10rpx;
+  padding: 14rpx 18rpx;
+  margin-bottom: 16rpx;
+}
+
+.wf-missing-title {
+  font-size: 22rpx;
+  color: #8a5a00;
+}
+
+.wf-missing-list {
+  font-size: 22rpx;
+  color: #8a5a00;
+}
+
+.wf-groups {
+  margin-top: 8rpx;
+}
+
+.wf-group {
+  background: #fafbfd;
+  border-radius: 12rpx;
+  padding: 18rpx;
+  margin-bottom: 8rpx;
+}
+
+.wf-group-head {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.wf-group-name {
+  font-size: 24rpx;
+  color: var(--tss-text-sub);
+  margin-right: 14rpx;
+}
+
+.wf-nodes {
+  display: flex;
+  flex-direction: column;
+}
+
+.wf-node {
+  background: #ffffff;
+  border: 1rpx solid var(--tss-line);
+  border-radius: 10rpx;
+  padding: 16rpx 18rpx;
+  margin-bottom: 12rpx;
+}
+
+.wf-node:last-child {
+  margin-bottom: 0;
+}
+
+.wf-node.is-current {
+  border-color: var(--tss-primary);
+  background: var(--tss-primary-weak);
+}
+
+.wf-node-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wf-node-name {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.wf-node-type {
+  font-size: 22rpx;
+  color: var(--tss-text-sub);
+}
+
+/* 抄送（CC）不是审批动作：视觉上必须与审批节点区分，避免被当成"待我处理"。 */
+.wf-node-type.nt-cc {
+  color: var(--tss-text-weak);
+  background: #f0f2f6;
+  border-radius: 6rpx;
+  padding: 0 10rpx;
+}
+
+.wf-node-type.nt-unknown {
+  color: var(--tss-text-weak);
+}
+
+.wf-node-status {
+  display: flex;
+  align-items: center;
+  margin-top: 10rpx;
+}
+
+.wf-dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  background: var(--tss-info);
+  margin-right: 10rpx;
+}
+
+.ns-active .wf-dot { background: var(--tss-primary); }
+.ns-completed .wf-dot { background: var(--tss-success); }
+.ns-pending .wf-dot { background: #c9cfda; }
+.ns-returned .wf-dot { background: var(--tss-warning); }
+.ns-skipped .wf-dot { background: #d5dae2; }
+.ns-cancelled .wf-dot { background: var(--tss-danger); }
+
+.ns-active .wf-status-text { color: var(--tss-primary); }
+.ns-completed .wf-status-text { color: var(--tss-success); }
+.ns-returned .wf-status-text { color: var(--tss-warning); }
+.ns-cancelled .wf-status-text { color: var(--tss-danger); }
+.ns-pending .wf-status-text,
+.ns-skipped .wf-status-text,
+.ns-unknown .wf-status-text { color: var(--tss-info); }
+
+.wf-status-text {
+  font-size: 24rpx;
+}
+
+.wf-current-flag {
+  margin-left: 12rpx;
+  font-size: 20rpx;
+  color: var(--tss-primary);
+  border: 1rpx solid var(--tss-primary);
+  border-radius: 6rpx;
+  padding: 0 8rpx;
+}
+
+.wf-node-assignee {
+  margin-top: 8rpx;
+}
+
+.wf-node-assignee-text {
+  font-size: 24rpx;
+  color: var(--tss-text-sub);
+}
+
+.wf-node-time {
+  margin-top: 6rpx;
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+}
+
+.wf-arrow {
+  text-align: center;
+  color: var(--tss-text-weak);
+  font-size: 24rpx;
+  padding: 4rpx 0 12rpx;
+}
+
+.wf-events {
+  margin-top: 20rpx;
+}
+
+.wf-events-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 12rpx;
+}
+
+.wf-events-empty {
+  font-size: 24rpx;
+  color: var(--tss-text-weak);
+  background: #f7f8fa;
+  border-radius: 10rpx;
+  padding: 18rpx;
+}
+
+.wf-event {
+  border-left: 6rpx solid var(--tss-info);
+  padding: 12rpx 0 12rpx 18rpx;
+  margin-bottom: 16rpx;
+}
+
+.wf-event.ev-approved { border-left-color: var(--tss-success); }
+.wf-event.ev-rejected { border-left-color: var(--tss-danger); }
+.wf-event.ev-returned { border-left-color: var(--tss-warning); }
+.wf-event.ev-started { border-left-color: var(--tss-primary); }
+.wf-event.ev-saved { border-left-color: #b9c0cc; }
+
+.wf-event-head {
+  display: flex;
+  justify-content: space-between;
+}
+
+.wf-event-action {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.wf-event-time {
+  font-size: 24rpx;
+  color: var(--tss-text-sub);
+}
+
+.wf-event-body {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--tss-text-sub);
+}
+
+.wf-event-meta {
+  margin-top: 4rpx;
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+  display: flex;
+  justify-content: space-between;
+}
+
+.wf-event-comment {
+  margin-top: 6rpx;
+  font-size: 24rpx;
+  color: var(--tss-text);
+  background: #f7f8fa;
+  border-radius: 8rpx;
+  padding: 10rpx 14rpx;
+}

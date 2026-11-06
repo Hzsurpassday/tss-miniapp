@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.viding</groupId>
+        <artifactId>datahub-v2</artifactId>
+        <version>2.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>tss-wx-api</artifactId>
+    <name>TSS WX API (RC2 /wx/v1 + /admin/v1/tss)</name>
+    <description>
+        时空智审 V1.0 RC2 契约适配层：实现 /wx/v1 的 API-01..API-11 与 /admin/v1/tss 的 API-12..API-13。
+        字段级唯一标准为 tss-openapi-v1.0-rc2.yaml。V1.0 只读，不产生任何 ERP 审批写回。
+        独立模块的目的：可在不依赖 MySQL/Flyway/Quartz/后台管理会话的前提下于 8787 端口真实启动，
+        以便对 13 个端点执行真实 HTTP 契约测试；不修改、不影响既有 datahub-backend 的任何行为。
+    </description>
+
+    <properties>
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>tss-wx-api</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- 契约测试命名为 *IT：它们是「真实启动容器 + 真实 HTTP」的测试，
+                         必须每次 CI 都执行（决议 B1），因此显式纳入 surefire 的默认生命周期。 -->
+                    <includes>
+                        <include>**/*Test.java</include>
+                        <include>**/*IT.java</include>
+                    </includes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

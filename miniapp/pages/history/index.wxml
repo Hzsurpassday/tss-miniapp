@@ -1,0 +1,86 @@
+<view class="tss-page">
+
+  <view class="tss-notice" wx:if="{{sampleBanner}}">{{sampleBanner}}</view>
+
+  <view class="tss-notice danger" wx:if="{{errorText}}">
+    <view>{{errorText}}</view>
+    <view wx:if="{{traceId}}" class="hs-trace" bindtap="onCopyTraceId">traceId：{{traceId}}（点击复制）</view>
+  </view>
+
+  <!-- 未绑定引导 -->
+  <view class="tss-card" wx:if="{{needBinding}}">
+    <view class="tss-card-title">尚未绑定 ERP 员工</view>
+    <view class="tss-text-sub">当前微信身份没有绑定 ERP 账号，因此无法读取历史记录。绑定后即可查看。</view>
+    <view class="tss-btn" bindtap="onGoProfile">去绑定</view>
+  </view>
+
+  <block wx:if="{{!needBinding}}">
+
+  <!-- 筛选 -->
+  <view class="tss-card">
+    <view class="tss-card-title">
+      <text>筛选</text>
+      <text class="hs-reset" bindtap="onResetFilter">重置</text>
+    </view>
+
+    <scroll-view class="hs-tabs" scroll-x="true">
+      <view class="hs-tab {{item.key === docType ? 'is-active' : ''}}" wx:for="{{docTypeTabs}}" wx:key="key" data-key="{{item.key}}" bindtap="onDocTypeTab">
+        {{item.label}}
+      </view>
+    </scroll-view>
+
+    <view class="hs-filter">
+      <text class="hs-filter-label">动作</text>
+      <picker mode="selector" range="{{actionOptions}}" range-key="label" value="{{actionIndex}}" bindchange="onActionChange">
+        <view class="hs-picker">{{actionOptions[actionIndex].label}}</view>
+      </picker>
+    </view>
+
+    <view class="hs-filter">
+      <text class="hs-filter-label">开始</text>
+      <picker mode="date" value="{{from}}" end="{{to || today}}" bindchange="onFromChange">
+        <view class="hs-picker {{from ? '' : 'is-empty'}}">{{from || '不限'}}</view>
+      </picker>
+    </view>
+
+    <view class="hs-filter">
+      <text class="hs-filter-label">结束</text>
+      <picker mode="date" value="{{to}}" start="{{from}}" end="{{today}}" bindchange="onToChange">
+        <view class="hs-picker {{to ? '' : 'is-empty'}}">{{to || '不限'}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <freshness-bar meta="{{meta}}" />
+
+  <view class="hs-list">
+    <view class="tss-card hs-item" wx:for="{{items}}" wx:key="recordId">
+      <view class="hs-item-head">
+        <text class="hs-action {{item.actionClass}}">{{item.actionText}}</text>
+        <text class="tss-tag gray">{{item.docTypeText}}</text>
+      </view>
+      <view class="hs-item-line">
+        <text class="hs-label">单号</text>
+        <text class="hs-value">{{item.billNo}} / {{item.taskNum}}</text>
+      </view>
+      <view class="hs-item-line">
+        <text class="hs-label">动作名称</text>
+        <text class="hs-value">{{item.actionName}}</text>
+      </view>
+      <view class="hs-item-line">
+        <text class="hs-label">处理人</text>
+        <text class="hs-value">{{item.operatorText}}</text>
+      </view>
+      <view class="hs-item-foot">
+        <text class="hs-time">{{item.processedAtText}}</text>
+        <text class="{{item.resultVerifiedClass}}">{{item.resultVerifiedText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <empty-state visible="{{emptyVisible && !loading}}" text="暂无历史记录" hint="可调整筛选条件或下拉刷新" />
+  <view class="tss-loading" wx:if="{{loading}}">加载中…</view>
+  <view class="tss-loading" wx:elif="{{loadingMore}}">正在加载更多…</view>
+  <view class="tss-loading" wx:elif="{{!hasMore && items.length > 0}}">没有更多了</view>
+  </block>
+</view>

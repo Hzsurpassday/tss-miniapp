@@ -1,0 +1,108 @@
+<!--
+  工作流只读渲染。
+  红线：本组件不包含任何「同意 / 驳回」等真实审批按钮，readOnly 为 true 时也严禁出现。
+-->
+<view class="wf" wx:if="{{view}}">
+
+  <view class="wf-head">
+    <view class="wf-head-line">
+      <text class="wf-label">流程</text>
+      <text class="wf-value">{{view.workflowId}}</text>
+    </view>
+    <view class="wf-head-line">
+      <text class="wf-label">类型</text>
+      <text class="wf-value">{{view.graphTypeText}}</text>
+    </view>
+    <!-- graphType 为 DAG / UNKNOWN / 缺失时的降级声明：不谎称完整支持，明说按节点顺序展示 -->
+    <view class="wf-degraded" wx:if="{{view.graphTypeDegraded}}">
+      <text class="wf-degraded-text">{{view.graphTypeNote}}</text>
+    </view>
+    <view class="wf-head-line">
+      <text class="wf-label">实例</text>
+      <text class="wf-value">{{view.instanceId}}</text>
+    </view>
+    <view class="wf-head-line">
+      <text class="wf-label">定义版本</text>
+      <text class="wf-value {{view.definitionVersionText === '服务端未提供' ? 'wf-missing' : ''}}">{{view.definitionVersionText}}</text>
+    </view>
+    <view class="wf-head-line">
+      <text class="wf-label">数据版本</text>
+      <text class="wf-value">{{view.dataVersionText}}</text>
+    </view>
+    <view class="wf-head-line" wx:if="{{view.currentNodeNames}}">
+      <text class="wf-label">当前节点</text>
+      <text class="wf-value wf-current">{{view.currentNodeNames}}</text>
+    </view>
+  </view>
+
+  <!-- 只读声明 -->
+  <view class="wf-readonly">
+    <text class="tss-tag gray">只读</text>
+    <text class="wf-readonly-text">V1.0 不支持在小程序内执行审批动作</text>
+  </view>
+
+  <!-- 缺失字段如实提示（便于联调定位服务端漂移） -->
+  <view class="wf-missing-box" wx:if="{{view.missingFields.length > 0}}">
+    <text class="wf-missing-title">服务端未返回字段：</text>
+    <text class="wf-missing-list">{{view.missingFieldsText}}</text>
+  </view>
+
+  <!-- 分组：branchGroup + parallelMode -->
+  <view class="wf-groups">
+    <block wx:for="{{view.groups}}" wx:for-item="group" wx:key="groupKey">
+      <view class="wf-group">
+        <view class="wf-group-head" wx:if="{{group.groupLabel || group.showParallelTag}}">
+          <text class="wf-group-name" wx:if="{{group.groupLabel}}">{{group.groupLabel}}</text>
+          <text class="tss-tag" wx:if="{{group.showParallelTag}}">{{group.parallelModeText}}</text>
+        </view>
+
+        <view class="wf-nodes">
+          <view class="wf-node {{node.statusClass}} {{node.isCurrent ? 'is-current' : ''}}"
+                wx:for="{{group.nodes}}"
+                wx:for-item="node"
+                wx:key="nodeId">
+            <view class="wf-node-top">
+              <text class="wf-node-name">{{node.name}}</text>
+              <text class="wf-node-type {{node.nodeTypeClass}}">{{node.nodeTypeText}}</text>
+            </view>
+            <view class="wf-node-status">
+              <text class="wf-dot"></text>
+              <text class="wf-status-text">{{node.statusText}}</text>
+              <text class="wf-current-flag" wx:if="{{node.isCurrent}}">当前</text>
+            </view>
+            <view class="wf-node-assignee" wx:if="{{node.hasAssignees}}">
+              <text class="wf-node-assignee-text">{{node.assigneeText}}</text>
+            </view>
+            <view class="wf-node-time" wx:if="{{node.completedAtText}}">{{node.completedAtText}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="wf-arrow" wx:if="{{index < view.groups.length - 1}}">↓</view>
+    </block>
+  </view>
+
+  <!-- 流转事件时间轴 -->
+  <view class="wf-events" wx:if="{{showEvents}}">
+    <view class="wf-events-title">流转记录（{{view.eventCountText}}）</view>
+    <view class="wf-events-empty" wx:if="{{!view.hasEvents}}">
+      服务端未返回 events，不展示任何推测的流转记录
+    </view>
+    <view class="wf-event {{event.actionClass}}" wx:for="{{view.events}}" wx:for-item="event" wx:key="eventId">
+      <view class="wf-event-head">
+        <text class="wf-event-action">{{event.actionText}}</text>
+        <text class="wf-event-time">{{event.occurredAtText}}</text>
+      </view>
+      <view class="wf-event-body">
+        <text class="wf-event-operator">{{event.operatorText}}</text>
+        <text class="wf-event-node" wx:if="{{event.nodeName}}">· {{event.nodeName}}</text>
+        <text class="wf-event-menu" wx:if="{{event.menuNameText}}">· {{event.menuNameText}}</text>
+      </view>
+      <view class="wf-event-meta">
+        <text class="wf-event-outcome">结果：{{event.outcomeText}}</text>
+        <text class="wf-event-serial" wx:if="{{event.serialNumText}}">流水号：{{event.serialNumText}}</text>
+      </view>
+      <view class="wf-event-comment" wx:if="{{event.hasComment}}">意见：{{event.commentText}}</view>
+    </view>
+  </view>
+
+</view>

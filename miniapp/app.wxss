@@ -1,0 +1,218 @@
+/** 全局样式：设计变量 + 通用组件类（仅使用原生 WXSS 能力）。 */
+
+page {
+  --tss-primary: #1a6cff;
+  --tss-primary-weak: #eaf1ff;
+  --tss-success: #17a673;
+  --tss-warning: #e8930c;
+  --tss-danger: #e0453a;
+  --tss-info: #6b7688;
+  --tss-text: #1c2430;
+  --tss-text-sub: #6b7688;
+  --tss-text-weak: #9aa4b5;
+  --tss-bg: #f4f6fa;
+  --tss-card: #ffffff;
+  --tss-line: #eceff5;
+  --tss-radius: 16rpx;
+
+  background: var(--tss-bg);
+  color: var(--tss-text);
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+view,
+text,
+scroll-view {
+  box-sizing: border-box;
+}
+
+.tss-page {
+  padding: 24rpx 24rpx 40rpx;
+}
+
+/* 卡片 */
+.tss-card {
+  background: var(--tss-card);
+  border-radius: var(--tss-radius);
+  padding: 28rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 2rpx 12rpx rgba(28, 36, 48, 0.05);
+}
+
+.tss-card-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.tss-card-sub {
+  font-size: 24rpx;
+  color: var(--tss-text-sub);
+  font-weight: 400;
+}
+
+/* 通用行 */
+.tss-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid var(--tss-line);
+}
+
+.tss-row:last-child {
+  border-bottom: none;
+}
+
+.tss-row-label {
+  color: var(--tss-text-sub);
+  font-size: 26rpx;
+  min-width: 200rpx;
+  flex-shrink: 0;
+}
+
+.tss-row-value {
+  color: var(--tss-text);
+  font-size: 28rpx;
+  text-align: right;
+  word-break: break-all;
+  flex: 1;
+}
+
+.tss-row-value.is-missing {
+  color: var(--tss-text-weak);
+}
+
+/* 徽标 / 标签 */
+.tss-tag {
+  display: inline-block;
+  padding: 2rpx 14rpx;
+  border-radius: 8rpx;
+  font-size: 22rpx;
+  line-height: 1.8;
+  background: var(--tss-primary-weak);
+  color: var(--tss-primary);
+}
+
+.tss-tag.gray {
+  background: #f0f2f6;
+  color: var(--tss-info);
+}
+
+.tss-tag.warn {
+  background: #fff3e0;
+  color: var(--tss-warning);
+}
+
+.tss-tag.success {
+  background: #e6f7ef;
+  color: var(--tss-success);
+}
+
+.tss-tag.danger {
+  background: #fdeceb;
+  color: var(--tss-danger);
+}
+
+/* 状态色 */
+.st-pending { color: var(--tss-warning); }
+.st-completed { color: var(--tss-success); }
+.st-returned { color: var(--tss-danger); }
+.st-cancelled { color: var(--tss-text-weak); }
+.st-unknown { color: var(--tss-info); }
+
+.fr-fresh { color: var(--tss-success); }
+.fr-delayed { color: var(--tss-warning); }
+.fr-unavailable { color: var(--tss-danger); }
+.fr-unknown { color: var(--tss-info); }
+
+/* 提示条 */
+.tss-notice {
+  background: #fff8e6;
+  border: 1rpx solid #ffe0a3;
+  border-radius: 12rpx;
+  padding: 18rpx 20rpx;
+  font-size: 24rpx;
+  color: #8a5a00;
+  margin-bottom: 20rpx;
+}
+
+.tss-notice.info {
+  background: var(--tss-primary-weak);
+  border-color: #c9dbff;
+  color: #14468f;
+}
+
+.tss-notice.danger {
+  background: #fdeceb;
+  border-color: #f8c7c3;
+  color: #a3271f;
+}
+
+/* 按钮 */
+.tss-btn {
+  display: block;
+  width: 100%;
+  height: 84rpx;
+  line-height: 84rpx;
+  text-align: center;
+  border-radius: 12rpx;
+  background: var(--tss-primary);
+  color: #ffffff;
+  font-size: 30rpx;
+  margin-top: 20rpx;
+}
+
+.tss-btn.ghost {
+  background: #ffffff;
+  color: var(--tss-primary);
+  border: 1rpx solid var(--tss-primary);
+}
+
+.tss-btn.plain {
+  background: #f0f2f6;
+  color: var(--tss-text);
+}
+
+.tss-btn.danger {
+  background: #ffffff;
+  color: var(--tss-danger);
+  border: 1rpx solid var(--tss-danger);
+}
+
+.tss-btn.disabled {
+  background: #dfe3ea;
+  color: #ffffff;
+}
+
+/* 文本 */
+.tss-text-sub {
+  color: var(--tss-text-sub);
+  font-size: 26rpx;
+}
+
+.tss-text-weak {
+  color: var(--tss-text-weak);
+  font-size: 24rpx;
+}
+
+.tss-mono {
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.tss-divider {
+  height: 1rpx;
+  background: var(--tss-line);
+  margin: 20rpx 0;
+}
+
+.tss-loading {
+  text-align: center;
+  color: var(--tss-text-weak);
+  font-size: 26rpx;
+  padding: 30rpx 0;
+}

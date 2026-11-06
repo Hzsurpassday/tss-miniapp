@@ -1,0 +1,65 @@
+.idx-total {
+  text-align: center;
+}
+
+.idx-total-num {
+  font-size: 96rpx;
+  font-weight: 700;
+  color: var(--tss-primary);
+  line-height: 1.1;
+}
+
+.idx-total-label {
+  font-size: 28rpx;
+  color: var(--tss-text-sub);
+  margin-top: 6rpx;
+}
+
+.idx-total-time {
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+  margin-top: 8rpx;
+}
+
+.idx-total-btn {
+  margin-top: 24rpx;
+}
+
+.idx-grid {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -10rpx;
+}
+
+.idx-cell {
+  width: 50%;
+  padding: 10rpx;
+}
+
+.idx-cell-num {
+  background: var(--tss-primary-weak);
+  border-radius: 12rpx;
+  padding: 24rpx 0;
+  text-align: center;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: var(--tss-primary);
+}
+
+.idx-cell-label {
+  text-align: center;
+  font-size: 26rpx;
+  color: var(--tss-text-sub);
+  margin-top: 8rpx;
+}
+
+.idx-bind {
+  margin-top: 20rpx;
+  margin-bottom: 0;
+}
+
+.idx-trace {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  text-decoration: underline;
+}

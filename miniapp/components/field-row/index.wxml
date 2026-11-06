@@ -1,0 +1,9 @@
+<view class="fr-row" wx:if="{{view}}">
+  <text class="fr-label">{{view.label}}</text>
+  <view class="fr-value">
+    <text wx:if="{{view.isBadge}}" class="tss-tag">{{view.display}}</text>
+    <text wx:elif="{{view.isMissing}}" class="fr-missing">{{view.display}}</text>
+    <text wx:else class="fr-text">{{view.display}}</text>
+    <text wx:if="{{view.showUnverified}}" class="fr-unverified">未核实</text>
+  </view>
+</view>

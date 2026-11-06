@@ -1,0 +1,100 @@
+<view class="tss-page">
+
+  <view class="tss-notice info" wx:if="{{notModified}}">数据未变更（HTTP 304），当前展示本地缓存副本。</view>
+  <view class="tss-notice" wx:if="{{sampleBanner}}">{{sampleBanner}}</view>
+
+  <view class="tss-notice danger" wx:if="{{errorText}}">
+    <view>{{errorText}}</view>
+    <view wx:if="{{traceId}}" class="dt-trace" bindtap="onCopyTraceId">traceId：{{traceId}}（点击复制）</view>
+  </view>
+
+  <!-- 未绑定引导 -->
+  <view class="tss-card" wx:if="{{needBinding}}">
+    <view class="tss-card-title">尚未绑定 ERP 员工</view>
+    <view class="tss-text-sub">当前微信身份没有绑定 ERP 账号，因此无法查看该单据。绑定后即可查看。</view>
+    <view class="tss-btn" bindtap="onGoProfile">去绑定</view>
+  </view>
+
+  <block wx:if="{{!needBinding}}">
+
+  <freshness-bar meta="{{meta}}" />
+
+  <!-- 基本信息 -->
+  <view class="tss-card" wx:if="{{!noBaseFields || titleText}}">
+    <view class="tss-card-title">
+      <text>{{titleText}}</text>
+      <text class="tss-card-sub">{{docTypeText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">单据编号</text>
+      <text class="tss-row-value">{{taskNum}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">审批标识</text>
+      <text class="tss-row-value">{{approvalIdText}}</text>
+    </view>
+    <view class="tss-divider"></view>
+    <field-row wx:for="{{baseFields}}" wx:key="key" field="{{item}}" />
+    <view class="dt-empty" wx:if="{{noBaseFields}}">服务端未返回基本信息字段</view>
+  </view>
+
+  <!-- 明细行 -->
+  <view class="tss-card" wx:if="{{!noLines}}">
+    <view class="tss-card-title">明细</view>
+    <view class="dt-line" wx:for="{{lines}}" wx:key="lineId">
+      <view class="dt-line-title">{{item.title}}</view>
+      <field-row wx:for="{{item.fields}}" wx:key="key" field="{{item}}" />
+    </view>
+  </view>
+
+  <!-- 工作流（只读） -->
+  <view class="tss-card">
+    <view class="tss-card-title">
+      <text>审批流程</text>
+      <text class="tss-card-sub">只读</text>
+    </view>
+    <workflow-graph workflow="{{workflow}}" showEvents="{{true}}" />
+  </view>
+
+  <!-- 来源状态说明 -->
+  <view class="tss-card" wx:if="{{sourceStatus}}">
+    <view class="tss-card-title">来源单据状态</view>
+    <view class="tss-row">
+      <text class="tss-row-label">来源表</text>
+      <text class="tss-row-value">{{sourceStatus.sourceNameText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">终审状态</text>
+      <text class="tss-row-value">{{sourceStatus.finalApprovedText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">下游单据</text>
+      <text class="tss-row-value">{{sourceStatus.downstreamText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">库存变更</text>
+      <text class="tss-row-value">{{sourceStatus.inventoryText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">最近核销</text>
+      <text class="tss-row-value">{{sourceStatus.lastVerifiedAtText}}</text>
+    </view>
+    <view class="tss-notice info dt-notes" wx:if="{{sourceStatus.hasNotes}}">{{sourceStatus.notesText}}</view>
+  </view>
+
+  <!-- 可用动作：只按后端返回渲染 -->
+  <view class="tss-card">
+    <view class="tss-card-title">可执行动作</view>
+    <view class="dt-actions" wx:if="{{actions.length > 0}}">
+      <view class="dt-action" wx:for="{{actions}}" wx:key="action" data-action="{{item.action}}" bindtap="onActionTap">
+        <text class="tss-tag {{item.primary ? '' : 'gray'}}">{{item.text}}</text>
+      </view>
+    </view>
+    <view class="dt-empty" wx:else>服务端未返回可用动作</view>
+    <view class="tss-divider"></view>
+    <view class="tss-text-weak">{{readonlyNotice}}</view>
+  </view>
+
+  <view class="tss-loading" wx:if="{{loading}}">加载中…</view>
+  </block>
+</view>

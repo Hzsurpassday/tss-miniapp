@@ -1,0 +1,71 @@
+# 时空智审 RC2 契约适配层（/wx/v1 + /admin/v1/tss）
+#
+# 说明：本文件只配置「契约适配层自身」的运行参数，不触碰 datahub-backend 的既有配置。
+# 端口默认 8787（契约修订决议 B2 指定的开发者本机联调地址）。
+server:
+  port: ${TSS_WX_PORT:8787}
+  error:
+    include-message: never
+    include-stacktrace: never
+
+spring:
+  application:
+    name: tss-wx-api
+  profiles:
+    active: ${TSS_WX_PROFILE:dev}
+  mvc:
+    problemdetails:
+      enabled: false
+
+logging:
+  level:
+    com.viding.datahub.tss.wx: INFO
+
+datahub:
+  tss:
+    wx:
+      # RC2 DataMeta.schemaVersion：随契约冻结值输出
+      schema-version: ${TSS_WX_SCHEMA_VERSION:1.0.0}
+      # RC2 DataMeta.dataMode：本适配层为 MOCK（DEV Mock 数据服务）。真实 ERP 接入前不得改为 ERP。
+      data-mode: ${TSS_WX_DATA_MODE:MOCK}
+      # 所有 ISO-8601 时间输出的时区（RC2 要求带时区偏移）
+      clock-zone: ${TSS_WX_CLOCK_ZONE:Asia/Shanghai}
+      # 静态样例源（B1）：取自 api-examples-rc2.json，仅作为 MOCK 数据，不代表已接入真实 ERP
+      mock-examples: ${TSS_WX_MOCK_EXAMPLES:classpath:mock/api-examples-rc2.json}
+      # RC2 DataMeta.freshness（F2）。默认 FRESH 只对 MOCK 数据源成立（数据就在本进程内）；
+      # 可注入 DELAYED / UNAVAILABLE 以验证前端新鲜度提示条的另两条分支。
+      # 接真实 ERP 后必须改为按 asOf 与阈值计算，不得继续用静态配置冒充实时判断。
+      freshness: ${TSS_WX_FRESHNESS:FRESH}
+
+      cursor:
+        # 不透明签名游标的 HMAC 密钥。为空时进程启动时随机生成（重启后旧游标失效，属预期行为）。
+        secret: ${TSS_WX_CURSOR_SECRET:}
+        ttl-seconds: ${TSS_WX_CURSOR_TTL:1800}
+        default-limit: ${TSS_WX_PAGE_DEFAULT:20}
+        max-limit: ${TSS_WX_PAGE_MAX:100}
+
+      # 真实微信登录（唯一真实身份来源）。未配置即 fail-closed：API-01 返回 503 TSS_NOT_CONFIGURED。
+      wechat:
+        enabled: ${TSS_WX_WECHAT_ENABLED:false}
+        appid: ${TSS_WX_WECHAT_APPID:}
+        secret: ${TSS_WX_WECHAT_SECRET:}
+        code2-session-url: ${TSS_WX_WECHAT_CODE2SESSION_URL:https://api.weixin.qq.com/sns/jscode2session}
+        timeout-ms: ${TSS_WX_WECHAT_TIMEOUT_MS:5000}
+        session-ttl-seconds: ${TSS_WX_WECHAT_SESSION_TTL:7200}
+
+      # DEV 专用 Mock 令牌颁发器（B1 安全红线）。四重条件全部满足才可用，默认全部不满足。
+      mock-token:
+        enabled: ${TSS_WX_MOCK_TOKEN_ENABLED:false}
+        env-attestation: ${TSS_WX_MOCK_TOKEN_ENV_ATTESTATION:}
+        ttl-seconds: ${TSS_WX_MOCK_TOKEN_TTL:7200}
+
+      # 订阅消息（API-08）：服务端已知可用的微信订阅消息模板 ID 白名单。
+      # 未列入白名单的模板 ⇒ subscriptionStatus=UNAVAILABLE，不得谎报为 GRANTED。
+      subscription:
+        known-template-ids: ${TSS_WX_KNOWN_TEMPLATE_IDS:wx_tpl_01}
+
+      # PC 管理端令牌（adminAuth）。
+      # 【安全声明】RC2 未定义管理端令牌的颁发机制；此处仅为 DEV 联调提供可配置静态令牌。
+      # 未配置任何令牌 => 所有 /admin/v1/tss/** 一律 401（fail-closed）。生产必须接入真实 RBAC。
+      admin:
+        static-tokens: ${TSS_WX_ADMIN_STATIC_TOKENS:}

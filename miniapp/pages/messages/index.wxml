@@ -1,0 +1,58 @@
+<view class="tss-page">
+
+  <view class="tss-notice" wx:if="{{sampleBanner}}">{{sampleBanner}}</view>
+
+  <view class="tss-notice danger" wx:if="{{errorText}}">
+    <view>{{errorText}}</view>
+    <view wx:if="{{traceId}}" class="ms-trace" bindtap="onCopyTraceId">traceId：{{traceId}}（点击复制）</view>
+  </view>
+
+  <!-- 未绑定引导 -->
+  <view class="tss-card" wx:if="{{needBinding}}">
+    <view class="tss-card-title">尚未绑定 ERP 员工</view>
+    <view class="tss-text-sub">当前微信身份没有绑定 ERP 账号，因此无法读取通知。绑定后即可查看。</view>
+    <view class="tss-btn" bindtap="onGoProfile">去绑定</view>
+  </view>
+
+  <block wx:if="{{!needBinding}}">
+
+  <!-- 订阅意愿 -->
+  <view class="tss-card">
+    <view class="tss-card-title">待办提醒</view>
+    <view class="tss-row">
+      <text class="tss-row-label">订阅状态</text>
+      <text class="tss-row-value">{{subscriptionStatusText}}</text>
+    </view>
+    <view class="tss-row" wx:if="{{subscriptionRecordedAtText}}">
+      <text class="tss-row-label">记录时间</text>
+      <text class="tss-row-value">{{subscriptionRecordedAtText}}</text>
+    </view>
+    <view class="tss-text-weak ms-hint">{{templateHint}}</view>
+    <view class="tss-btn {{consentBusy ? 'disabled' : ''}}" bindtap="onSubscribeTap">
+      {{consentBusy ? '处理中…' : '开启待办提醒'}}
+    </view>
+  </view>
+
+  <freshness-bar meta="{{meta}}" />
+
+  <!-- 通知列表 -->
+  <view class="ms-list">
+    <view class="tss-card ms-item" wx:for="{{items}}" wx:key="id" data-index="{{index}}" bindtap="onItemTap">
+      <view class="ms-item-head">
+        <text class="ms-title">{{item.title}}</text>
+        <text class="tss-tag {{item.unread ? '' : 'gray'}}">{{item.unread ? '未读' : '已读'}}</text>
+      </view>
+      <view class="ms-body">{{item.body}}</view>
+      <view class="ms-item-foot">
+        <text class="tss-tag gray">{{item.typeText}}</text>
+        <text class="ms-time">{{item.createdAtText}}</text>
+      </view>
+    </view>
+  </view>
+
+  <empty-state visible="{{emptyVisible && !loading}}" text="暂无通知" hint="下拉可刷新" />
+  <view class="tss-loading" wx:if="{{loading}}">加载中…</view>
+  <view class="tss-loading" wx:elif="{{loadingMore}}">正在加载更多…</view>
+  <view class="tss-loading" wx:elif="{{!hasMore && items.length > 0}}">没有更多了</view>
+  </block>
+</view>

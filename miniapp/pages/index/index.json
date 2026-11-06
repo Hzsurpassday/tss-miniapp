@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "时空智审",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "freshness-bar": "/components/freshness-bar/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

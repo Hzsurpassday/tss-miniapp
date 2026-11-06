@@ -1,0 +1,51 @@
+{
+  "description": "时空智审 V1.0 微信小程序（原生 + TypeScript）。本文件为团队共享配置，urlCheck 保持 true（真机/体验版/生产必须走已备案且已登记为小程序合法 request 域名的 HTTPS 地址）。本机开发者工具联调 HTTP/IP 请通过 project.private.config.json 覆盖（见 README）。",
+  "appid": "wx16d988aa2b90af65",
+  "compileType": "miniprogram",
+  "libVersion": "3.5.0",
+  "projectname": "tss-miniapp",
+  "miniprogramRoot": "./",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "compileWithHotModuleReload": false,
+    "useCompilerPlugins": [
+      "typescript"
+    ],
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
+  },
+  "condition": {
+    "miniprogram": {
+      "list": [
+        {
+          "name": "首页（待办概览）",
+          "pathName": "pages/index/index",
+          "query": "",
+          "scene": null
+        },
+        {
+          "name": "待办详情 355377",
+          "pathName": "pages/detail/index",
+          "query": "taskNum=355377",
+          "scene": null
+        }
+      ]
+    }
+  }
+}

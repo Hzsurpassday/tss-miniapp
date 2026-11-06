@@ -1,0 +1,421 @@
+{
+  "API-01": {
+    "request": {
+      "code": "WECHAT_LOGIN_CODE"
+    },
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "sessionToken": "sess_example",
+        "expiresIn": 7200,
+        "bindStatus": "UNBOUND",
+        "needBinding": true
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-02": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "userId": "U4FXG07VRDI",
+        "entId": "E498AU5L35J",
+        "displayName": "示例员工",
+        "bindStatus": "BOUND",
+        "bindingVersion": 3,
+        "enterpriseSwitchEnabled": false
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-03": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "counts": {
+          "total": 1,
+          "purchaseInbound": 0,
+          "salesBusiness": 1,
+          "payment": 0,
+          "salesPricing": 0
+        },
+        "lastFetchedAt": "2026-10-31T10:30:00+08:00",
+        "meta": {
+          "dataMode": "MOCK",
+          "asOf": "2026-10-31T10:30:00+08:00",
+          "freshness": "FRESH",
+          "schemaVersion": "1.0.0"
+        }
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-04": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "items": [
+          {
+            "approvalId": "a_355372_355377",
+            "taskNum": "355377",
+            "instanceId": "355372",
+            "billNo": "77971",
+            "docType": "SALES_BUSINESS",
+            "title": "销售业务审批",
+            "counterparty": "示例客户",
+            "amount": "19800.00",
+            "currency": "CNY",
+            "currentNodeName": "风控审核",
+            "createdAt": "2026-10-31T10:30:00+08:00",
+            "updatedAt": "2026-10-31T10:30:00+08:00",
+            "status": "PENDING",
+            "dataMode": "MOCK"
+          }
+        ],
+        "page": {
+          "nextCursor": null,
+          "hasMore": false,
+          "totalApprox": 1
+        },
+        "meta": {
+          "dataMode": "MOCK",
+          "asOf": "2026-10-31T10:30:00+08:00",
+          "freshness": "FRESH",
+          "schemaVersion": "1.0.0"
+        }
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-05": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "approvalId": "a_355372_355377",
+        "taskNum": "355377",
+        "docType": "SALES_BUSINESS",
+        "base": [
+          {
+            "key": "billNo",
+            "label": "单据编号",
+            "value": "77971",
+            "format": "TEXT",
+            "verified": true
+          },
+          {
+            "key": "amount",
+            "label": "含税金额",
+            "value": "19800.00",
+            "format": "AMOUNT",
+            "verified": false
+          }
+        ],
+        "lines": [
+          {
+            "lineId": "1",
+            "fields": [
+              {
+                "key": "goodsSpec",
+                "label": "规格",
+                "value": "Φ20",
+                "format": "TEXT",
+                "verified": false
+              },
+              {
+                "key": "weightTons",
+                "label": "重量（吨）",
+                "value": "12.500",
+                "format": "WEIGHT_TON",
+                "verified": false
+              }
+            ]
+          }
+        ],
+        "workflow": {
+          "workflowId": "dq.xskd",
+          "instanceId": "355372",
+          "currentNodeIds": [
+            "risk"
+          ],
+          "nodes": [
+            {
+              "nodeId": "start",
+              "name": "提交",
+              "nodeType": "START",
+              "status": "COMPLETED",
+              "assignees": [],
+              "completedAt": "2026-10-31T10:30:00+08:00",
+              "branchGroup": null,
+              "parallelMode": "NONE"
+            },
+            {
+              "nodeId": "risk",
+              "name": "风控审核",
+              "nodeType": "APPROVAL",
+              "status": "ACTIVE",
+              "assignees": [
+                "审批人甲"
+              ],
+              "completedAt": null,
+              "branchGroup": null,
+              "parallelMode": "NONE"
+            }
+          ],
+          "edges": [
+            {
+              "from": "start",
+              "to": "risk",
+              "label": null
+            }
+          ],
+          "graphType": "LINEAR",
+          "dataVersion": "20261031-001",
+          "definitionVersion": "v1",
+          "readOnly": true,
+          "events": [
+            {
+              "eventId": "evt_mock_1",
+              "nodeId": "start",
+              "actionType": "STARTED",
+              "menuName": "保存并提交",
+              "operatorDisplay": "示例员工",
+              "occurredAt": "2026-10-31T10:30:00+08:00",
+              "outcome": "SUCCESS",
+              "serialNum": "355375",
+              "comment": null
+            }
+          ]
+        },
+        "sourceStatus": {
+          "sourceName": "SaleNotesMt",
+          "isFinalApproved": false,
+          "downstreamReceiptStatus": "NOT_VERIFIED",
+          "inventoryChanged": null,
+          "lastVerifiedAt": null,
+          "notes": "销售业务，不等同于正式发票开具"
+        },
+        "availableActions": [
+          "VIEW"
+        ],
+        "meta": {
+          "dataMode": "MOCK",
+          "asOf": "2026-10-31T10:30:00+08:00",
+          "freshness": "FRESH",
+          "schemaVersion": "1.0.0"
+        }
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-06": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "items": [
+          {
+            "recordId": "r_1",
+            "approvalId": "a_355372_355377",
+            "taskNum": "355377",
+            "billNo": "77971",
+            "docType": "SALES_BUSINESS",
+            "action": "APPROVED",
+            "actionName": "审批完成",
+            "processedAt": "2026-10-31T10:30:00+08:00",
+            "operatorDisplay": "示例员工",
+            "resultVerified": true
+          }
+        ],
+        "page": {
+          "nextCursor": null,
+          "hasMore": false,
+          "totalApprox": 1
+        },
+        "meta": {
+          "dataMode": "MOCK",
+          "asOf": "2026-10-31T10:30:00+08:00",
+          "freshness": "FRESH",
+          "schemaVersion": "1.0.0"
+        }
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-07": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "items": [
+          {
+            "id": "n_1",
+            "title": "待办提醒",
+            "body": "您有一条销售业务审批待办",
+            "type": "NEW_TODO",
+            "createdAt": "2026-10-31T10:30:00+08:00",
+            "readAt": null,
+            "approvalId": "a_355372_355377"
+          }
+        ],
+        "page": {
+          "nextCursor": null,
+          "hasMore": false,
+          "totalApprox": 1
+        },
+        "meta": {
+          "dataMode": "MOCK",
+          "asOf": "2026-10-31T10:30:00+08:00",
+          "freshness": "FRESH",
+          "schemaVersion": "1.0.0"
+        }
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-08": {
+    "request": {
+      "templateIds": [
+        "wx_tpl_01"
+      ],
+      "consented": true
+    },
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "subscriptionStatus": "GRANTED",
+        "recordedAt": "2026-10-31T10:30:00+08:00"
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-09": {
+    "request": {
+      "inviteCode": "INV-EXAMPLE",
+      "claimNonce": "nonce_001"
+    },
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "bindRequestId": "br_001",
+        "status": "PENDING_PC_CONFIRM",
+        "expiresAt": "2026-10-31T10:30:00+08:00"
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-10": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "bindRequestId": "br_001",
+        "status": "PENDING_PC_CONFIRM",
+        "erpUserMasked": "U4****RDI",
+        "entDisplayName": "示例企业",
+        "checkedAt": "2026-10-31T10:30:00+08:00"
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-11": {
+    "request": {
+      "confirmation": "UNBIND",
+      "clientNonce": "nonce_002"
+    },
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "revokedAt": "2026-10-31T10:30:00+08:00",
+        "bindStatus": "UNBOUND"
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-12": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "items": [
+          {
+            "bindingId": "b_1",
+            "userId": "U4FXG07VRDI",
+            "entId": "E498AU5L35J",
+            "openidMasked": "o_****",
+            "bindStatus": "BOUND",
+            "bindingVersion": 3,
+            "updatedAt": "2026-10-31T10:30:00+08:00"
+          }
+        ],
+        "page": {
+          "nextCursor": null,
+          "hasMore": false,
+          "totalApprox": 1
+        },
+        "auditInfo": {
+          "accessLogged": true,
+          "scope": "AUTHORIZED_ENT"
+        }
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  },
+  "API-13": {
+    "request": null,
+    "response": {
+      "code": "SUCCESS",
+      "message": "OK",
+      "data": {
+        "definitions": [
+          {
+            "docType": "PURCHASE_INBOUND",
+            "formId": "0dqkuagm3iw04e0a",
+            "displayName": "采购入库审批",
+            "validationLevel": "PARTIAL",
+            "fields": [
+              {
+                "key": "supplier",
+                "label": "供应商",
+                "sourceColumn": null,
+                "nullable": true,
+                "verified": false
+              }
+            ]
+          }
+        ],
+        "validationLevel": "PARTIAL",
+        "updatedAt": "2026-10-31T10:30:00+08:00"
+      },
+      "traceId": "tr_20261031_001",
+      "timestamp": "2026-10-31T10:30:00+08:00"
+    }
+  }
+}

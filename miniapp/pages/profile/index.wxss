@@ -1,0 +1,44 @@
+.pf-input {
+  background: #f7f8fa;
+  border-radius: 10rpx;
+  padding: 18rpx 20rpx;
+  font-size: 28rpx;
+  margin-bottom: 8rpx;
+}
+
+.pf-tip {
+  margin-top: 14rpx;
+}
+
+.pf-picker {
+  background: #f7f8fa;
+  border-radius: 10rpx;
+  padding: 16rpx 20rpx;
+  font-size: 26rpx;
+  color: var(--tss-primary);
+  margin-bottom: 16rpx;
+}
+
+.pf-switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14rpx 0;
+}
+
+.pf-switch-label {
+  font-size: 28rpx;
+  color: var(--tss-text);
+}
+
+.pf-conflict {
+  margin-bottom: 0;
+  font-size: 22rpx;
+  line-height: 1.7;
+}
+
+.pf-trace {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  text-decoration: underline;
+}

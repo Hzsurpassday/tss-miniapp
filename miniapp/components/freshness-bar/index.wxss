@@ -1,0 +1,32 @@
+.fb {
+  background: #ffffff;
+  border-radius: var(--tss-radius);
+  padding: 20rpx 24rpx;
+  margin-bottom: 20rpx;
+}
+
+.fb-line {
+  display: flex;
+  align-items: center;
+}
+
+.fb-line .tss-tag {
+  margin-right: 14rpx;
+}
+
+.fb-schema {
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+}
+
+.fb-hint {
+  margin-top: 10rpx;
+  font-size: 22rpx;
+  color: var(--tss-text-sub);
+}
+
+.fb-extra {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: var(--tss-warning);
+}

@@ -1,0 +1,17 @@
+# ===== Node / 微信小程序 (miniapp/) =====
+miniapp/node_modules/
+miniapp/.DS_Store
+
+# ===== Java / Maven 构建产物 (tss-wx-api/) =====
+tss-wx-api/target/
+
+# ===== IDE / 编辑器 =====
+.idea/
+.vscode/
+*.iml
+
+# ===== OS / 临时 =====
+.DS_Store
+Thumbs.db
+*.7z
+*.log

@@ -1,0 +1,29 @@
+# DEV profile：仅用于开发者本机联调（127.0.0.1:8787）。
+#
+# 【安全红线 B1】Mock 令牌颁发器在本 profile 下仍需「显式开关 + 运行环境自证 + 回环来源」三重条件，
+# 仅激活 dev profile 并不会自动开启；且 MockTokenGuard 会在启动时校验：
+# 若 mock-token.enabled=true 而 profile 不是 dev（或同时含 test/prod），进程直接启动失败（fail-closed）。
+
+datahub:
+  tss:
+    wx:
+      # DEV 下允许启用 Mock 令牌颁发器；默认仍为 false（需显式设为 true 才生效）。
+      mock-token:
+        enabled: ${TSS_WX_MOCK_TOKEN_ENABLED:false}
+        # 运行环境自证：必须是 DEV_LOCAL 才允许颁发；留空或任何其它值一律拒绝。
+        env-attestation: ${TSS_WX_MOCK_TOKEN_ENV_ATTESTATION:}
+        ttl-seconds: ${TSS_WX_MOCK_TOKEN_TTL:7200}
+
+      # DEV 管理端静态令牌（仅本机联调）。
+      # 【RC3 红线】源码与配置文件中不得存放任何永久/默认密钥：此处默认值为空（fail-closed），
+      # 必须由运行环境注入，例如（令牌值请用你自己的，不要照抄）：
+      #   export TSS_WX_ADMIN_STATIC_TOKENS='<你的令牌>=ADMIN|E498AU5L35J'
+      #   ... --datahub.tss.wx.admin.static-tokens='<你的令牌>=ADMIN|E498AU5L35J'
+      # 格式： <token>=<ROLE>|<entId>  多个用逗号分隔；ROLE 目前仅 ADMIN 有效。
+      # 未注入 => 所有 /admin/v1/tss/** 一律 401（属预期行为，不是故障）。
+      admin:
+        static-tokens: ${TSS_WX_ADMIN_STATIC_TOKENS:}
+
+logging:
+  level:
+    com.viding.datahub.tss.wx: DEBUG

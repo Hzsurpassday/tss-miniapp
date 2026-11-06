@@ -1,0 +1,5 @@
+node_modules/
+project.private.config.json
+config/generated.env.ts
+*.log
+.DS_Store

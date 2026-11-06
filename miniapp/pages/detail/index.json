@@ -1,0 +1,11 @@
+{
+  "navigationBarTitleText": "待办详情",
+  "enablePullDownRefresh": true,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "field-row": "/components/field-row/index",
+    "workflow-graph": "/components/workflow-graph/index",
+    "freshness-bar": "/components/freshness-bar/index",
+    "empty-state": "/components/empty-state/index"
+  }
+}

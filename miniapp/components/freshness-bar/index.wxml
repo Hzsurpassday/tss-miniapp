@@ -1,0 +1,9 @@
+<view class="fb" wx:if="{{view}}">
+  <view class="fb-line">
+    <text class="tss-tag {{view.freshnessClass}}">{{view.freshnessText}}</text>
+    <text class="tss-tag gray">{{view.dataModeText}}</text>
+    <text class="fb-schema">schema {{view.schemaVersionText}}</text>
+  </view>
+  <view class="fb-hint">{{view.freshnessHint}} · 数据时间 {{view.asOfText}}</view>
+  <view class="fb-extra" wx:if="{{view.extraText}}">{{view.extraText}}</view>
+</view>

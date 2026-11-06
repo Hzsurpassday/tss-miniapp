@@ -1,0 +1,32 @@
+.es {
+  padding: 80rpx 40rpx;
+  text-align: center;
+}
+
+.es-icon {
+  font-size: 60rpx;
+  color: #d5dae2;
+  line-height: 1;
+}
+
+.es-text {
+  margin-top: 20rpx;
+  font-size: 28rpx;
+  color: var(--tss-text-sub);
+}
+
+.es-hint {
+  margin-top: 10rpx;
+  font-size: 24rpx;
+  color: var(--tss-text-weak);
+}
+
+.es-action {
+  margin-top: 24rpx;
+  display: inline-block;
+  padding: 12rpx 32rpx;
+  border: 1rpx solid var(--tss-primary);
+  border-radius: 10rpx;
+  color: var(--tss-primary);
+  font-size: 26rpx;
+}

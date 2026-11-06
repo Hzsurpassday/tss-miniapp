@@ -1,0 +1,44 @@
+.ms-item {
+  padding: 24rpx;
+}
+
+.ms-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ms-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.ms-body {
+  margin-top: 10rpx;
+  font-size: 26rpx;
+  color: var(--tss-text-sub);
+}
+
+.ms-item-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14rpx;
+}
+
+.ms-time {
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+}
+
+.ms-hint {
+  margin-top: 12rpx;
+}
+
+.ms-trace {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  text-decoration: underline;
+}

@@ -1,0 +1,69 @@
+<view class="tss-page">
+
+  <!-- 环境风险提示：非 HTTPS 仅开发者工具可用 -->
+  <view class="tss-notice danger" wx:if="{{!https}}">
+    当前 base URL 为 HTTP/IP（{{baseUrl}}），仅供微信开发者工具「不校验合法域名」下联调；真机预览、体验版与生产必须使用已备案的 HTTPS 域名。
+  </view>
+
+  <!-- 静态样例提示 -->
+  <view class="tss-notice" wx:if="{{sampleBanner}}">{{sampleBanner}}</view>
+
+  <!-- 错误提示（含 traceId，便于与后端日志对齐） -->
+  <view class="tss-notice danger" wx:if="{{errorText}}">
+    <view>{{errorText}}</view>
+    <view wx:if="{{traceId}}" class="idx-trace" bindtap="onCopyTraceId">traceId：{{traceId}}（点击复制）</view>
+  </view>
+
+  <!-- 数据新鲜度 / 来源 -->
+  <freshness-bar meta="{{meta}}" extra="{{loading ? '正在拉取最新数据…' : ''}}" />
+
+  <!-- 总待办 -->
+  <view class="tss-card idx-total">
+    <view class="idx-total-num">{{total}}</view>
+    <view class="idx-total-label">待我审批（总数）</view>
+    <view class="idx-total-time" wx:if="{{lastFetchedAtText}}">最近拉取：{{lastFetchedAtText}}</view>
+    <view class="tss-btn ghost idx-total-btn" bindtap="onGoTodos">查看全部待办</view>
+  </view>
+
+  <!-- 四业务分类 -->
+  <view class="tss-card">
+    <view class="tss-card-title">
+      <text>业务分类</text>
+      <text class="tss-card-sub">点击进入对应待办</text>
+    </view>
+    <view class="idx-grid">
+      <view class="idx-cell" wx:for="{{cards}}" wx:key="docType" data-doctype="{{item.docType}}" bindtap="onCardTap">
+        <view class="idx-cell-num">{{item.count}}</view>
+        <view class="idx-cell-label">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 账号与绑定 -->
+  <view class="tss-card">
+    <view class="tss-card-title">账号</view>
+    <view class="tss-row">
+      <text class="tss-row-label">当前用户</text>
+      <text class="tss-row-value">{{displayName}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">绑定状态</text>
+      <text class="tss-row-value">{{bindStatusText}}</text>
+    </view>
+    <view class="tss-row">
+      <text class="tss-row-label">企业</text>
+      <text class="tss-row-value">{{entIdText}}</text>
+    </view>
+    <view class="tss-notice info idx-bind" wx:if="{{needBinding}}">
+      尚未完成 ERP 账号绑定，待办数据不可用。请到「我的」提交邀请码完成绑定。
+    </view>
+    <view class="tss-btn ghost" wx:if="{{needBinding}}" bindtap="onGoProfile">去绑定</view>
+  </view>
+
+  <!-- 只读声明 -->
+  <view class="tss-card">
+    <view class="tss-text-sub">{{readonlyNotice}}</view>
+  </view>
+
+  <view class="tss-loading" wx:if="{{loading}}">加载中…</view>
+</view>

@@ -1,0 +1,19 @@
+{
+  "name": "tss-miniapp",
+  "version": "1.0.0-rc2",
+  "private": true,
+  "description": "时空智审 V1.0 微信小程序（原生 + TypeScript，无跨端框架）",
+  "scripts": {
+    "env": "node scripts/gen-env.mjs",
+    "typecheck": "tsc -p tsconfig.json",
+    "check:wxml": "node scripts/check-wxml.mjs",
+    "check": "npm run typecheck && npm run check:wxml"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  },
+  "comments": {
+    "typings": "本工程自带 typings/wx.d.ts 极简声明，离线即可通过微信开发者工具 TS 编译。若改用官方 miniprogram-api-typings，请删除 typings/wx.d.ts 并在 tsconfig.json 中设置 \"types\": [\"miniprogram-api-typings\"]。",
+    "runtimeDeps": "运行时零第三方依赖：不使用 Taro / uni-app / 任何跨端抽象。"
+  }
+}

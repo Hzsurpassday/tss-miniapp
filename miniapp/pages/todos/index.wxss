@@ -1,0 +1,100 @@
+.td-search {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 12rpx;
+  padding: 16rpx 20rpx;
+  margin-bottom: 16rpx;
+}
+
+.td-input {
+  flex: 1;
+  font-size: 28rpx;
+}
+
+.td-clear {
+  color: var(--tss-primary);
+  font-size: 26rpx;
+  padding-left: 16rpx;
+}
+
+.td-tabs {
+  white-space: nowrap;
+  margin-bottom: 16rpx;
+}
+
+.td-tab {
+  display: inline-block;
+  padding: 12rpx 28rpx;
+  margin-right: 14rpx;
+  background: #ffffff;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  color: var(--tss-text-sub);
+}
+
+.td-tab.is-active {
+  background: var(--tss-primary);
+  color: #ffffff;
+}
+
+.td-item {
+  padding: 24rpx;
+}
+
+.td-item-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.td-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.td-item-line {
+  display: flex;
+  justify-content: space-between;
+  padding: 6rpx 0;
+}
+
+.td-label {
+  color: var(--tss-text-sub);
+  font-size: 24rpx;
+}
+
+.td-value {
+  font-size: 26rpx;
+  color: var(--tss-text);
+}
+
+.td-amount {
+  font-weight: 600;
+}
+
+.td-item-foot {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14rpx;
+  padding-top: 14rpx;
+  border-top: 1rpx solid var(--tss-line);
+}
+
+.td-status {
+  font-size: 24rpx;
+}
+
+.td-time {
+  font-size: 22rpx;
+  color: var(--tss-text-weak);
+}
+
+.td-trace {
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  text-decoration: underline;
+}
