@@ -1,11 +1,14 @@
 # 时空智审 V1.0（RC3）交付仓库
 
-本仓库包含「时空智审」V1.0（RC3）的两套工程：
+本仓库包含「时空智审」V1.0（RC3）的三套工程：
 
 | 目录 | 工程 | 说明 |
 |------|------|------|
 | `miniapp/` | 微信小程序（原生 + TypeScript） | 6 个页面 + 4 个组件，封装 11 个 `/wx/v1` 接口；V1.0 为**只读**版本，无审批写回能力。 |
 | `tss-wx-api/` | Java 接口后端（Spring Boot） | RC3 接口程序，含小程序业务 API、fail-closed 鉴权、契约 Mock 与测试。 |
+| `tss-mock/` | Python 契约 Mock 服务（RC3 + 安全修复） | 13 端点联调服务，默认 MOCK 模式、无需数据库；`python server.py` 或 `docker compose up -d --build` 启动。含控制面安全修复与部署操作单。 |
+
+> **2026-11-07 新增 `tss-mock/`**：修复了控制面 `/__mock/*` 匿名可重置缺陷（GET 可匿名触发 reset、无鉴权、reset 清空限流桶）。现为「强制 POST + 默认仅 loopback + 可选控制面令牌 + 部署层 Nginx 白名单」四层防护，`python verify.py` 206/206 通过。详见 `tss-mock/DEPLOY.md`。
 
 ## 安全说明
 

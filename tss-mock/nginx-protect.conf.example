@@ -1,0 +1,138 @@
+# =============================================================================
+# 时空智审 V1.0 /wx/v1 契约 MOCK 服务 —— 公网暴露时的 Nginx 止血白名单
+# 文件：rc3/mock/nginx-protect.conf.example（示例片段，直接复制进 server {} 块）
+# 目标服务：python server.py（默认监听 0.0.0.0:9000）
+#
+# 【为什么这一层是必需主防线，不是可选项】
+#   1) server.py 的代码层控制面门禁在「未配置 TSS_MOCK_CTRL_TOKEN」时，
+#      靠 handler.client_address[0] 是否为 loopback 来放行 /__mock/*。
+#   2) 一旦经过 Nginx / SLB / 任意反向代理，后端 TCP 对端恒为反代自身，
+#      client_address[0] 恒为 127.0.0.1 —— 代码层的 loopback 判定**全部失效**，
+#      任何公网来源都会被误判为「本机」而放行控制面。
+#      即便配置了 proxy_set_header X-Forwarded-For，Python Mock 也不读取该头，
+#      改变不了 client_address（下文仍保留该头，仅供后端访问日志留痕）。
+#   3) 因此：**公网暴露时必须在 Nginx 这一层做 location 精确白名单**，
+#      把 /__mock/* 与一切非契约路径挡在到达 Python 进程之前。
+#      「代码层门禁」只用于本机直连场景，绝不能当作公网防线。
+#
+# 【同样能给存量 RC1 实例止血】
+#   RC1 基线 server.py 的控制面完全没有鉴权、也不挑 method（属历史存证，
+#   按交付约束不得修改）。把本配置的后端地址指向 RC1 实例的监听端口，
+#   即可在不改一行 RC1 代码的前提下，让公网无法触达其 /__mock/* ——
+#   这是存量实例唯一可行的止血手段。
+#
+# 【二选一：/__mock/ 的拒绝方式】
+#   A. return 404;  —— 本配置采用。与代码层 TSS_NOT_FOUND 一致，
+#                      对公网完全隐藏控制面存在性（推荐）。
+#   B. deny all;    —— 返回 403，运维排障时一眼可见「被明确拦截」。
+#   两者只启用一条，不要同时写；下方已把 B 注释掉。
+#
+# 【不在白名单内、默认一律拒绝】
+#   /__mock/*（控制面）、/dev-support/v1/tss/*（DEV 支持面探针）、
+#   以及任何未列出的 /wx/v1/** 路径。若内网 DEV 环境确实需要探针，
+#   可自行再加一条精确 location，但**公网配置不要加**。
+#
+# 【用法】
+#   1) 把下面片段复制进你的 server {} 块（或 include 本文件）；
+#   2) 把 127.0.0.1:9000 换成实际后端监听地址；
+#   3) 建议同时把 server.py 的监听从 0.0.0.0 收紧到 127.0.0.1，
+#      只允许本机 Nginx 访问（双保险）；
+#   4) nginx -t 校验通过后 reload。
+#
+# 【白名单清单】13 条契约路径 + /healthz（不多放一条）
+#   1  /wx/v1/auth/login                POST
+#   2  /wx/v1/me                       GET
+#   3  /wx/v1/todos                    GET
+#   4  /wx/v1/todos/summary            GET
+#   5  /wx/v1/todos/<taskNum>/detail   GET（正则精确锚定单段 taskNum）
+#   6  /wx/v1/history                  GET
+#   7  /wx/v1/notifications            GET
+#   8  /wx/v1/notifications/consent    POST
+#   9  /wx/v1/bindings/claim           POST
+#  10  /wx/v1/bindings/status          GET
+#  11  /wx/v1/bindings/unbind          POST
+#  12  /admin/v1/tss/bindings          GET
+#  13  /admin/v1/tss/mappings          GET
+#   +  /healthz                        GET（运维探活）
+# =============================================================================
+
+# ---- server 级公共反代头（会被下方各 location 继承）----
+# 注意：这些头仅供后端记录，Python Mock 不据此鉴权，见文件头说明。
+proxy_set_header Host               $host;
+proxy_set_header X-Real-IP          $remote_addr;
+proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+
+# ---- 运维探活（不受控制面门禁影响）----
+location = /healthz {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+# ---- 契约 13 条路径：精确白名单 ----
+# location = 为精确匹配（只匹配 URI，query 参数不参与匹配，故 ?keyword=... 等照常放行）。
+location = /wx/v1/auth/login {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/me {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/todos {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/todos/summary {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+# API-05 详情：taskNum 为路径参数，用正则精确锚定，只放行单段 taskNum。
+# ^~ /__mock/ 的优先级高于正则，故不会被这条正则绕过。
+location ~ ^/wx/v1/todos/[^/]+/detail$ {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/history {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/notifications {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/notifications/consent {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/bindings/claim {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/bindings/status {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /wx/v1/bindings/unbind {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /admin/v1/tss/bindings {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+location = /admin/v1/tss/mappings {
+    proxy_pass http://127.0.0.1:9000;
+}
+
+# ---- 控制面：一律拒绝（^~ 前缀匹配优先于正则，确保不会被上方 detail 正则绕过）----
+location ^~ /__mock/ {
+    # 二选一（见文件头）：A. return 404（本配置采用，隐藏控制面存在性）
+    #                     B. deny all（返回 403，运维更直观）
+    return 404;
+    # deny all;
+}
+
+# ---- 兜底：白名单之外的一切路径（含 DEV 支持面探针）一律 404 ----
+location / {
+    return 404;
+}

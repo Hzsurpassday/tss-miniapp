@@ -1,0 +1,22 @@
+services:
+  tss-wx-mock:
+    build: .
+    image: tss-contract-mock:1.0.0-rc3
+    container_name: tss-wx-mock
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      # 会话 / 游标签名密钥。多副本部署必须一致，否则令牌互不相认。
+      # 未显式设置时由服务自行生成随机值（重启即失效），此处同样不给任何默认值。
+      TSS_MOCK_SECRET: "${TSS_MOCK_SECRET:?TSS_MOCK_SECRET 必须显式设置或在无需多副本时删除本行}"
+      # 管理员接口（API-12/13）令牌。
+      # RC3 安全要求：仓库内不得保留任何默认值，必须从宿主 ~/.env 或命令行注入：
+      #   TSS_ADMIN_TOKEN="$(openssl rand -base64 32)" docker compose up -d
+      # 未注入时服务会生成临时随机令牌并只打印到容器 stderr：
+      #   docker logs tss-wx-mock 2>&1 | grep '\[ADMIN\]'
+      TSS_ADMIN_TOKEN: "${TSS_ADMIN_TOKEN:-}"
+      TSS_MOCK_PORT: "9000"
+      TSS_MOCK_DATA_MODE: MOCK
+      TSS_MOCK_FAILURE: none
+      TSS_MOCK_FRESHNESS: FRESH

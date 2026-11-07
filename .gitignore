@@ -21,3 +21,11 @@ Thumbs.db
 *.token
 .env
 .env.local
+
+# ===== Python Mock (tss-mock/) =====
+tss-mock/__pycache__/
+tss-mock/*.pyc
+tss-mock/.env
+# 控制面令牌只由部署环境注入，绝不落盘入库
+tss-mock/.ctrl-token
+*.token.txt
