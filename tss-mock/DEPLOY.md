@@ -67,6 +67,44 @@
 
 > 注意：`verify.py` 的 `call()` 不带该头。若生产环境注入了控制面令牌，远程自检会被 404 拦住；本地自检（不注入该变量、走 loopback）不受影响。**默认不注入该变量**是推荐配置。
 
+### 同机反代残留风险：线上实测闭环（2026-11-07 22:10，主理人亲跑）
+
+QA 提出的首要残留风险是：若 nginx 与 Mock 同机且 `proxy_pass http://127.0.0.1:9000`，后端
+`client_address` 恒为 `127.0.0.1`，默认模式下控制面会对公网敞开。**线上拓扑确实命中该形态，
+但实测未失效**，证据如下（全部为只读 / 零副作用探测）：
+
+| 检查 | 实测结果 |
+|---|---|
+| OpenResty 网络模式 | `host`（`docker inspect -f '{{.HostConfig.NetworkMode}}'`） |
+| upstream | `server 127.0.0.1:9000`（`tss-mock.conf:13-16`） |
+| `/__mock/` nginx 规则 | `location ~ ^/__mock/ { allow 127.0.0.1; deny all; }`（:29-34）；`nginx -t` **通过** |
+| 容器网络 | bridge，网关 `172.17.0.1`，容器 `172.17.0.2`；`0.0.0.0:9000->9000/tcp` |
+| 宿主 `POST 127.0.0.1:9000/__mock/freshness`（经 docker-proxy） | **404 `TSS_NOT_FOUND`** |
+| 宿主带 Host 头 `POST 127.0.0.1/__mock/freshness`（经 80 反代，正是同机反代路径） | **404 `TSS_NOT_FOUND`** |
+| 容器内部 `POST 127.0.0.1:9000/__mock/freshness?value=FRESH` | **200 `SUCCESS`**（真 loopback 按设计放行） |
+| 公网 `GET` / `POST` `39.106.179.158:9000/__mock/reset` | **404 / 404**；`GET /healthz` **200** |
+| 宿主 GET / PUT / HEAD `127.0.0.1:9000/__mock/reset` | 404 / 404 / 501（HEAD 见 P3-1） |
+| 探测副作用 | `POST` 把 freshness 设回其当前值 `FRESH`；探测后 `TSS_MOCK_FRESHNESS=FRESH`、`/healthz` 仍 `freshness=FRESH`，**状态零变化** |
+| 线上程序哈希 | 容器内 `/app/server.py` 与宿主 `/root/tss-wx-mock-rc3/server.py` 均 `65e8f976…`，与本地一致 |
+
+**结论**：请求经 `docker-proxy` 后容器看到的是网关 `172.17.0.1` 而非 loopback，代码层门禁未失效；
+nginx `deny all` 另有一层兜底。**该残留风险在本部署形态下已闭环。**
+
+**仍保留的约束**：换到「nginx 与 Mock 同一网络命名空间、直连后端进程」的部署形态时，
+`client_address` 会变成真 loopback，必须重新验收并**强制启用** `nginx-protect.conf.example`
+白名单。另注：`tss-mock.bestsoft.vip` 在服务器上 `getent hosts` 无解析记录、外部连通性探测为
+`000`，当前联调走的是公网 IP:9000 直连，域名反代路径实际未承载流量，**不可视为已验证的公网防线**。
+
+### 已知偏差与运维提示（P3，判文档化、不改已部署代码）
+
+| 项 | 说明 | 处置 |
+|---|---|---|
+| P3-1 `HEAD /__mock/*` → 501 | 未实现 `do_HEAD`，由 `BaseHTTPRequestHandler` 直接回 501，不是统一信封 404。实测不进 `_handle()`、不触发控制面、会话仍有效 ⇒ fail-closed，非绕过 | 冻结 `server.py`，口径在 README 标注；若要求字面严格可补一行 `do_HEAD` |
+| P3-2 UTF-8 控制面令牌不可用 | 请求头按 latin-1 解码，中文 / emoji 令牌无法匹配，表现为 404 fail-closed、不崩溃 | 运维统一用 **ASCII** `TSS_MOCK_CTRL_TOKEN` |
+| `[ADMIN]` 临时令牌明文 | 未设 `TSS_ADMIN_TOKEN` 时启动日志打印临时管理员令牌明文（既有设计、README 已说明）；「令牌明文零回显」约束只针对**控制面令牌** | 显式注入 `TSS_ADMIN_TOKEN`，避免日志留存明文 |
+| compose 文件与在跑容器不一致 | 服务器 `/root/tss-wx-mock-rc3/docker-compose.yml` 为 `container_name: tss-wx-mock`、`build: .`，且 `TSS_MOCK_SECRET` 是 `${...:?}` 必填；在跑容器名为 `tss-wx-mock-rc3` | **不要在该目录直接 `docker compose up -d`**（9000 端口冲突，且缺 `TSS_MOCK_SECRET` 直接失败）；继续用现有容器 / 镜像回滚方式 |
+| 镜像绑定 | 在跑容器创建自旧镜像 ID `9f2deb1d5adb`（已 retag 为 `1.0.0-rc3-pre-security-fix`），修复版是 `docker cp` 进运行时的；`tss-contract-mock:1.0.0-rc3` 已固化指向新镜像 `25ecc5894e76` | 重建 / 重启用 `tss-contract-mock:1.0.0-rc3` 标签即可拿到修复版；运行时 cp、`commit` 镜像、Dockerfile 重建三条路径均已是修复版 |
+
 ### 回滚方法
 
 ```bash

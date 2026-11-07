@@ -95,18 +95,35 @@ TSS_MOCK_PORT=9001 python3 server.py 2>&1 | grep '\[ADMIN\]'
 
 **控制面安全约束（RC3 安全整改）**：
 
-- **仅 `POST`**：6 个 `/__mock/*` 端点一律只接受 `POST`；`GET` / `PUT` / `DELETE` 等其它
-  method 一律 `404 TSS_NOT_FOUND`（与「路径不存在」同形，不新增错误码、不泄露控制面存在性）。
+- **仅 `POST`**：6 个 `/__mock/*` 端点一律只接受 `POST`；`GET` / `PUT` / `PATCH` /
+  `DELETE` 一律 `404 TSS_NOT_FOUND`（与「路径不存在」同形，不新增错误码、不泄露控制面存在性）。
   写回冻结探针 `/dev-support/v1/tss/write-guard-probe` 不在此列，仍按「不挑 method」原样。
+
+  > **已知字面偏差（P3-1，判文档化、不改码）**：服务未实现 `do_HEAD`，`HEAD /__mock/*`
+  > 由 `BaseHTTPRequestHandler` 直接返回 **501**，不是统一信封的 404。已实测该请求**不进
+  > `_handle()`、不分发路由、不改变任何状态**（HEAD 之后已登录会话仍有效），属 fail-closed，
+  > 不构成绕过。本次冻结已部署的 `server.py`（sha256 `65e8f976…`）不作改动；若后续要求
+  > 口径字面严格成立，补一行 `do_HEAD` 即可。
 - **默认仅 loopback 可访问**：未配置 `TSS_MOCK_CTRL_TOKEN` 时，只有来源为
   `127.0.0.1` / `::1` / `localhost` 的请求可进入；非 loopback 一律 `404 TSS_NOT_FOUND`。
   `verify.py` 本地自检（连 `127.0.0.1`、用 `POST`）与全部联调脚本因此不受影响。
-- **公网部署必须配 Nginx 白名单 + 可选令牌**：反代场景下后端看到的 `client_address`
-  恒为 `127.0.0.1`，代码层 loopback 判定会**失效**，因此公网暴露时
+- **公网部署必须配 Nginx 白名单 + 可选令牌**：若 nginx 与 Mock 同一网络命名空间、直连后端
+  进程（或任何使后端看到的 `client_address` 变成真 loopback 的形态），代码层 loopback
+  判定会**失效**，控制面将对公网敞开。因此公网暴露时
   **`nginx-protect.conf.example` 的 location 白名单是必需主防线，不是可选项**
   （这一层同样能给存量 RC1 实例止血）。确需远程控制面时，显式注入
   `TSS_MOCK_CTRL_TOKEN` 并在请求中携带 `X-Mock-Ctrl-Token` 头（常量时间比较，不匹配即 404）；
   令牌**禁止写入代码 / 文档 / 制品 / 仓库，禁止回显或打印明文**。
+
+  > **令牌字符集（P3-2）**：请求头按 latin-1 解码，UTF-8 多字节字符（中文 / emoji 等）
+  > 无法与服务端 Unicode 令牌相等，表现为 404 fail-closed（不崩溃、不绕过）。运维统一使用
+  > **ASCII 令牌**；Latin-1 可表示的非 ASCII 字符实测可用。
+  >
+  > **线上实测（2026-11-07，详见 `DEPLOY.md`）**：本部署为 Docker 端口映射 + OpenResty
+  > `host` 网络反代 `127.0.0.1:9000`，请求经 `docker-proxy` 后容器看到的是网关
+  > `172.17.0.1`（**非 loopback**）；宿主 loopback 与经 80 反代的 `POST /__mock/*` **均 404**，
+  > 容器内部真 loopback 才 200，`nginx -t` 通过且 `/__mock/` 有 `deny all`。
+  > 该风险在本拓扑下已被两道防线闭环，但**换部署形态必须重新验收**。
 - **reset 不再清空限流 / 幂等记录**：`POST /__mock/reset` 只清
   `STATE["sessions"]` / `STATE["bind_requests"]` / `STATE["consents"]`，**保留
   `STATE["rate"]`（限流桶）与 `STATE["nonces"]`（幂等记录）**，避免「循环 reset
