@@ -405,11 +405,14 @@ curl -s http://127.0.0.1:9002/wx/v1/todos/summary -H "Authorization: Bearer $TOK
 | `/dev-support/v1/tss/*` | **DEV 支持面**（与 Java `DevBindingFixtureController` 同级，能力探测） | `write-guard-probe` |
 
 > **安全说明（RC3 安全整改）**：`/__mock/*` 是**改数据状态**的联调后门，绝不能对公网匿名可达。
-> 四层防线：① 代码层强制 `POST` only（其它 method 一律 404）；② 未配令牌时仅 loopback
+> 四层防线：① 代码层强制 `POST` only（`GET`/`PUT`/`PATCH`/`DELETE` 一律 404；
+> `HEAD` 为 501 fail-closed，见上文 P3-1）；② 未配令牌时仅 loopback
 > 来源可进入，拒绝即 `404 TSS_NOT_FOUND`，对公网隐藏控制面存在性（不新增错误码）；
 > ③ 需要远程时显式注入 `TSS_MOCK_CTRL_TOKEN` + `X-Mock-Ctrl-Token` 头（常量时间比较）；
 > ④ **部署层 `nginx-protect.conf.example` 的 location 精确白名单是公网暴露时的必需主防线**
-> —— 反代会让后端 `client_address` 恒为 `127.0.0.1`，② 会失效，故④不可省略；
+> —— 若反代使后端看到的 `client_address` 变成真 loopback（例如 nginx 与 Mock 同一网络
+> 命名空间直连后端进程），② 会失效，故④不可省略；本部署经 `docker-proxy` 后看到的是网关
+> `172.17.0.1`（**非 loopback**），实测②仍生效，但换部署形态必须重新验收（见「控制面安全约束」）；
 > `location ^~ /__mock/ { deny all; }`（或 `return 404;`）同时可用于给**存量 RC1 实例**止血。
 > `/__mock/reset` 不再清空限流桶与幂等记录。`GET /healthz` 与 DEV 支持面探针不受这套门禁影响
 > （探针仍按「不挑 method」原样，门禁顺序见下文）。
